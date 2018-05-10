@@ -43,4 +43,22 @@ public class Cryptographic {
             return null;
         }
     }
+
+    public static byte[] encryptByteC(byte[] context, byte[] key) {
+        for (int i = 0, size = context.length; i < size; i++) {
+            for (byte keyBytes0 : key) {
+                context[i] = (byte) (context[i] ^ keyBytes0);
+            }
+        }
+        return context;
+    }
+
+    public static byte[] decodeByteC(byte[] context, byte[] key) {
+        for (int i = 0, size = context.length; i < size; i++) {
+            for (byte keyBytes0 : key) {
+                context[i] = (byte) (context[i] ^ keyBytes0);
+            }
+        }
+        return context;
+    }
 }

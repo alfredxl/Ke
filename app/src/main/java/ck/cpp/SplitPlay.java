@@ -85,7 +85,7 @@ public class SplitPlay {
                     // 取出dex文件
                     byte[] dexFileByte = new byte[tempCopyNumLength];
                     System.arraycopy(dexData, tempCopyNumStart, dexFileByte, 0, tempCopyNumLength);
-                    dexFileByte = Cryptographic.decodeByte(dexFileByte, byteCry);
+                    dexFileByte = Cryptographic.decodeByteC(dexFileByte, byteCry);
                     try {
                         FileOutputStream localFileOutputStream = new FileOutputStream(file);
                         localFileOutputStream.write(dexFileByte);

@@ -44,7 +44,7 @@ public class SplitAPKUtil {
             byte[] dexByteNum = ZipUtil.unpackEntry(oldApk, "classes.dex");
             List<byte[]> dexArray = new ArrayList<>();
             while (dexByteNum != null) {
-                dexArray.add(Cryptographic.encryptByte(dexByteNum, byteCry));
+                dexArray.add(Cryptographic.encryptByteC(dexByteNum, byteCry));
                 dexByteNum = ZipUtil.unpackEntry(oldApk, "classes" + dexNum + ".dex");
                 dexNum++;
             }
