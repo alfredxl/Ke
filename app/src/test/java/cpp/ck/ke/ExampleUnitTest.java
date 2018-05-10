@@ -2,13 +2,6 @@ package cpp.ck.ke;
 
 
 import org.junit.Test;
-import org.zeroturnaround.zip.ZipUtil;
-
-import java.io.File;
-
-import ck.cpp.Cut;
-import cn.wjdiankong.main.Utils;
-import cn.wjdiankong.main.XmlMain;
 
 /**
  * Example local unit test, which will execute on the development machine (host).

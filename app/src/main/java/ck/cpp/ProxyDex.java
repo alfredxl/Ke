@@ -5,26 +5,17 @@ import android.app.Instrumentation;
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.ProviderInfo;
-import android.os.Build;
 import android.text.TextUtils;
-import android.util.ArrayMap;
 import android.util.Log;
 
 import java.io.File;
-import java.io.IOException;
 import java.lang.ref.WeakReference;
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.ListIterator;
 import java.util.Map;
-import java.util.zip.ZipFile;
 
 import dalvik.system.DexClassLoader;
-import dalvik.system.DexFile;
 
 /**
  * <br> ClassName:   ${className}
@@ -36,7 +27,6 @@ import dalvik.system.DexFile;
 public class ProxyDex {
     public static void loaderDex(Context base) {
         loadPatchDex(base);
-//        loadPatchDexMultiDex(base);
     }
 
     private static void loadPatchDex(Context base) {
@@ -50,7 +40,7 @@ public class ProxyDex {
                         currentActivityThread, "mPackages");
                 WeakReference wr = (WeakReference) mPackages.get(packageName);
                 // 定义类装载器优化后的dex的存放路径
-                File optFile = new File(base.getFilesDir().getAbsolutePath());
+                File optFile = new File(base.getFilesDir().getAbsolutePath() + File.separator + "synchronous_odx_dex" + File.separator + "second_dex");
                 if (!optFile.exists()) {
                     optFile.mkdirs();
                 }
@@ -60,26 +50,8 @@ public class ProxyDex {
                 //替換成TargetApk.dex的ClassLoader
                 RefInvoke.setFieldOjbect("android.app.LoadedApk",
                         "mClassLoader", wr.get(), dLoader);
-                Log.i("ttag", "加载dex成功:" + new File(dexPath).getName());
             }
         } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    private static void loadPatchDexMultiDex(Context context){
-        List<File> files = SplitPlay.splitPayLoadFromDex2File(context);
-        try {
-            MultiLoad.installSecondaryDexes(context, files);
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        } catch (NoSuchFieldException e) {
-            e.printStackTrace();
-        } catch (InvocationTargetException e) {
-            e.printStackTrace();
-        } catch (NoSuchMethodException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
             e.printStackTrace();
         }
     }
@@ -127,7 +99,7 @@ public class ProxyDex {
             providers.clear();
         }
 
-        ArrayMap mProviderMap = RefInvoke.getFieldObject(
+        Map mProviderMap = RefInvoke.getFieldObject(
                 "android.app.ActivityThread", currentActivityThread,
                 "mProviderMap");
         Iterator it = mProviderMap.values().iterator();
@@ -144,7 +116,6 @@ public class ProxyDex {
 
     public static void onCreateProxy(Context base, String appClassName, Application app) {
         if (!TextUtils.isDigitsOnly(appClassName)) {
-            Log.i(base.getPackageName(), "reality_application : " + appClassName);
             Object currentActivityThread = RefInvoke.invokeStaticMethod(
                     "android.app.ActivityThread", "currentActivityThread",
                     new Class[]{}, new Object[]{});

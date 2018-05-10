@@ -2,12 +2,9 @@ package ck.cpp;
 
 import android.content.Context;
 import android.content.pm.PackageManager;
-import android.util.Log;
 
 import java.io.BufferedInputStream;
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -44,7 +41,7 @@ public class SplitPlay {
         return null;
     }
 
-    public static List<File> splitPayLoadFromDex2File(Context context) {
+    private static List<File> splitPayLoadFromDex2File(Context context) {
         try {
             byte[] dexData = readDexFileFromApk(context);
             int oldDexLen = dexData.length;
@@ -65,6 +62,11 @@ public class SplitPlay {
             int dexNum = Cut.byteArrayToInt(dexNumByte);
             String versionCode = String.valueOf(context.getPackageManager().getPackageInfo(context.getPackageName(), 0).versionCode);
             List<File> files = new ArrayList<>();
+            // 定义文件名
+            File parent = new File(context.getFilesDir().getAbsolutePath() + File.separator + "synchronous_odx_dex");
+            if (!parent.exists()) {
+                parent.mkdirs();
+            }
             for (int i = dexNum - 1; i >= 0; i--) {
                 // 取出dex长度
                 byte[] sunDexLengthByte = new byte[4];
@@ -74,8 +76,7 @@ public class SplitPlay {
                 tempCopyNumStart -= tempCopyNumLength;
                 System.arraycopy(dexData, tempCopyNumStart, sunDexLengthByte, 0, tempCopyNumLength);
                 int sunDexLength = Cut.byteArrayToInt(sunDexLengthByte);
-                // 定义文件名
-                File file = new File(context.getCacheDir().getAbsolutePath() + File.separator + versionCode + String.valueOf(sunDexLength) + String.valueOf(i) + ".dex");
+                File file = new File(parent.getAbsolutePath() + File.separator + versionCode + String.valueOf(sunDexLength) + String.valueOf(i) + ".dex");
                 // 重置拷贝长度
                 tempCopyNumLength = sunDexLength;
                 //重置拷贝起始位置
@@ -95,11 +96,24 @@ public class SplitPlay {
                 }
                 files.add(file);
             }
+            deleteDex(parent, versionCode);
             return files;
         } catch (IOException | PackageManager.NameNotFoundException e) {
             e.printStackTrace();
         }
         return null;
+    }
+
+    private static void deleteDex(File file, String versionCode) {
+        if (file.isFile()) {
+            if (!file.getName().startsWith(versionCode)) {
+                file.delete();
+            }
+        } else if (file.isDirectory()) {
+            for (File fl : file.listFiles()) {
+                deleteDex(fl, versionCode);
+            }
+        }
     }
 
     /**
